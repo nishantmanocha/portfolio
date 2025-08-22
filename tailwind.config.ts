@@ -5,8 +5,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        dark_bg: '#1E2336',
-        dark_border: '#1B1E2E',
+        dark_bg: '#000000',
+        dark_border: '#1a1a1a',
         about_me_green: '#7ee787',
         work_experience_orange: '#ffa28b',
         skills_purple: '#939aff',

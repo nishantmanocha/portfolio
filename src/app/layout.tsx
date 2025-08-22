@@ -33,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <Providers>
       <html lang="en">
-        <body className="bg-dark_bg min-h-screen max-h-screen flex flex-col scroll-smooth">
+        <body className="bg-black min-h-screen max-h-screen flex flex-col scroll-smooth">
           <Toaster />
           <TopBar />
           <AppShell>

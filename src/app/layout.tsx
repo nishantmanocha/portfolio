@@ -1,4 +1,4 @@
-import { ActivityBar, BottomBar, TabsContainer, TopBar } from '@/components';
+import { ActivityBar, BottomBar, TabsContainer, TopBar, AppShell } from '@/components';
 import NavigationChange from '@/components/NavigationChange';
 import TogglePortfolio from '@/components/TogglePortfolio';
 import { loadApps, loadLeetcode } from '@/lib/mdx';
@@ -33,15 +33,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <Providers>
       <html lang="en">
-        <body className="bg-dark_bg min-h-screen max-h-screen flex flex-col scroll-smooth">
+        <body className="bg-black min-h-screen max-h-screen flex flex-col scroll-smooth">
           <Toaster />
           <TopBar />
-          <main className="flex-1 flex overflow-hidden relative">
-            <ActivityBar sections={allSections} allApps={allApps} allLeetcode={allLeetcode} />
-            <div className="flex w-full flex-col overflow-hidden">
-              <TabsContainer /> {children}
-            </div>
-          </main>
+          <AppShell>
+            <main className="flex-1 flex overflow-hidden relative">
+              <ActivityBar sections={allSections} allApps={allApps} allLeetcode={allLeetcode} />
+              <div className="flex w-full flex-col overflow-hidden">
+                <TabsContainer /> {children}
+              </div>
+            </main>
+          </AppShell>
           <BottomBar />
           <TogglePortfolio />
           <NavigationChange allPaths={[...allApps, ...allLeetcode]} />

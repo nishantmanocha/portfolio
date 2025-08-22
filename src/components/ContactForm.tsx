@@ -28,35 +28,35 @@ function TextInput({ label, ...props }: React.ComponentPropsWithoutRef<'input'> 
 export default function ContactForm() {
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        person_name: e.currentTarget.person_name.value,
-        email: e.currentTarget.email.value,
-        company: e.currentTarget.company.value,
-        message: e.currentTarget.message.value,
-      }),
-    })
-      .then((res) => {
-        toast.success('Email sent!');
-        const target = e.target as HTMLFormElement;
-        target.reset();
-      })
-      .catch((err) => {
-        toast.error('Something went wrong, please try again later.');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+  // const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   fetch('/api/contact', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({
+  //       person_name: e.currentTarget.person_name.value,
+  //       email: e.currentTarget.email.value,
+  //       company: e.currentTarget.company.value,
+  //       message: e.currentTarget.message.value,
+  //     }),
+  //   })
+  //     .then((res) => {
+  //       toast.success('Email sent!');
+  //       const target = e.target as HTMLFormElement;
+  //       target.reset();
+  //     })
+  //     .catch((err) => {
+  //       toast.error('Something went wrong, please try again later.');
+  //     })
+  //     .finally(() => {
+  //       setLoading(false);
+  //     });
+  // };
 
   return (
     <FadeIn className="mt-10">
-      <form className="py-10" method="POST" onSubmit={handleSubmit}>
+      <form className="py-10" method="POST">
         <div className="isolate mt-6 -space-y-px rounded-2xl bg-gray-900/20">
           <TextInput label="Name" name="person_name" autoComplete="name" required />
           <TextInput label="Email" type="email" name="email" autoComplete="email" required />

@@ -24,11 +24,11 @@ export function FadeIn({ variants, viewportProp, ...props }: React.ComponentProp
         variants
           ? variants
           : isInStaggerGroup
-          ? {
+            ? {
               hidden: { opacity: 0, y: 16 },
               visible: { opacity: 1, y: 0 },
             }
-          : {
+            : {
               hidden: { opacity: 0 },
               visible: { opacity: 1 },
             }
@@ -36,13 +36,13 @@ export function FadeIn({ variants, viewportProp, ...props }: React.ComponentProp
       transition={{ duration: 0.5 }}
       {...(isInStaggerGroup
         ? {
-            viewport: viewportProp || {},
-          }
+          viewport: viewportProp || {},
+        }
         : {
-            initial: 'hidden',
-            whileInView: 'visible',
-            viewport: viewportProp || viewport,
-          })}
+          initial: 'hidden',
+          whileInView: 'visible',
+          viewport: viewportProp || viewport,
+        })}
       {...props}
     />
   );
@@ -56,11 +56,11 @@ export function FadeInStagger({ faster = false, once = false, ...props }: React.
         whileInView="visible"
         {...(once
           ? {
-              viewport: { ...viewport, once: true },
-            }
+            viewport: { ...viewport, once: true },
+          }
           : {
-              viewport,
-            })}
+            viewport,
+          })}
         transition={{ staggerChildren: faster ? 0.09 : 0.2 }}
         {...props}
       />

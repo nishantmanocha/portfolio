@@ -284,4 +284,14 @@
   background-image: linear-gradient(315deg, #3649aa 0%, #2bd2ff 52%, #2b60ff 90%);
 }
 
+@keyframes blink-block {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.cursor-block {
+  display: inline-block;
+  animation: blink-block 1s step-end infinite;
+}
+
 

@@ -25,6 +25,8 @@ import TabsContainer from './TabsContainer';
 import ToolTip from './ToolTip';
 import TopBar from './TopBar';
 import WorkExperience from './WorkExperience';
+import SplashScreen from './SplashScreen';
+import AppShell from './AppShell';
 
 export {
   AboutMe,
@@ -56,4 +58,6 @@ export {
   ToolTip,
   TopBar,
   WorkExperience,
+  SplashScreen,
+  AppShell,
 };

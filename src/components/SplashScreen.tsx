@@ -12,85 +12,74 @@ interface SplashScreenProps {
 const LINES = ["cd myportfolio", "code ."]; // lines to type
 
 function useTypewriter(lines: string[], onComplete: () => void, totalDurationMs: number) {
-	const [typedText, setTypedText] = React.useState<string[]>(lines.map(() => ""));
+	const [currentLineIndex, setCurrentLineIndex] = React.useState(0);
+	const [currentCharIndex, setCurrentCharIndex] = React.useState(0);
+	const [typedLines, setTypedLines] = React.useState<string[]>([]);
 
 	React.useEffect(() => {
-		// Compute per-line timings to fit within totalDurationMs minus a small buffer
-		const characters = lines.reduce((acc, l) => acc + l.length, 0);
-		const bufferMs = 600; // reserve for idle + fade coordination
-		const typeDuration = Math.max(1000, totalDurationMs - bufferMs);
-		const perCharMs = Math.max(20, Math.floor(typeDuration / Math.max(1, characters)));
+		if (currentLineIndex >= lines.length) {
+			onComplete();
+			return;
+		}
 
-		let lineIndex = 0;
-		let charIndex = 0;
-		let interval: NodeJS.Timeout | undefined;
+		const currentLine = lines[currentLineIndex];
+		const typingSpeed = 80; // milliseconds per character
 
-		const startTyping = () => {
-			interval = setInterval(() => {
-				if (lineIndex >= lines.length) {
-					if (interval) clearInterval(interval);
+		const timer = setTimeout(() => {
+			if (currentCharIndex < currentLine.length) {
+				// Type next character
+				setCurrentCharIndex(prev => prev + 1);
+			} else {
+				// Line complete, move to next line with a small delay
+				setTypedLines(prev => [...prev, currentLine]);
+				setTimeout(() => {
+					setCurrentLineIndex(prev => prev + 1);
+					setCurrentCharIndex(0);
+				}, 300); // 300ms delay between lines
+			}
+		}, typingSpeed);
+
+		return () => clearTimeout(timer);
+	}, [currentLineIndex, currentCharIndex, lines, onComplete]);
+
+	// Calculate total characters typed so far
+	const totalTyped = typedLines.join('').length + currentCharIndex;
+	const totalCharacters = lines.join('').length;
+	
+	// Ensure minimum duration
+	const minDuration = 3000; // 3 seconds minimum
+	const actualDuration = Math.max(minDuration, totalDurationMs);
+	
+	// Add delay if typing finished too early
+	React.useEffect(() => {
+		if (totalTyped >= totalCharacters) {
+			const remainingTime = actualDuration - (totalTyped * 80);
+			if (remainingTime > 0) {
+				const timer = setTimeout(() => {
 					onComplete();
-					return;
-				}
-				const currentLine = lines[lineIndex];
-				const nextCharIndex = charIndex + 1;
-				setTypedText((prev) => {
-					const updated = [...prev];
-					updated[lineIndex] = currentLine.slice(0, nextCharIndex);
-					return updated;
-				});
-				charIndex = nextCharIndex;
-				if (nextCharIndex >= currentLine.length) {
-					// short pause at end of line
-					if (interval) clearInterval(interval);
-					setTimeout(() => {
-						lineIndex += 1;
-						charIndex = 0;
-						startTyping();
-					}, 250);
-				}
-			}, perCharMs);
-		};
+				}, remainingTime);
+				return () => clearTimeout(timer);
+			}
+		}
+	}, [totalTyped, totalCharacters, actualDuration, onComplete]);
 
-		startTyping();
-		return () => {
-			if (interval) clearInterval(interval);
-		};
-	}, [lines, onComplete, totalDurationMs]);
-
-	return typedText;
+	return {
+		typedLines,
+		currentLine: lines[currentLineIndex]?.slice(0, currentCharIndex) || '',
+		isTyping: currentLineIndex < lines.length,
+		currentLineIndex
+	};
 }
 
 export default function SplashScreen({ onDone, totalDurationMs = 4600 }: SplashScreenProps) {
-	const doneRef = React.useRef(false);
-	const [readyToExit, setReadyToExit] = React.useState(false);
-	const typedText = useTypewriter(LINES, () => {
-		// Ensure splash lasts totalDurationMs even if typing finished early
-		if (!doneRef.current) {
-			doneRef.current = true;
-			setReadyToExit(true);
-		}
-	}, totalDurationMs);
-
-	React.useEffect(() => {
-		const timeout = setTimeout(() => {
-			if (!doneRef.current) {
-				doneRef.current = true;
-				setReadyToExit(true);
-			}
-		}, totalDurationMs);
-		return () => clearTimeout(timeout);
-	}, [totalDurationMs]);
+	const { typedLines, currentLine, isTyping, currentLineIndex } = useTypewriter(LINES, onDone || (() => {}), totalDurationMs);
 
 	return (
 		<motion.div
 			className="fixed inset-0 z-[1000] flex items-center justify-center bg-black"
 			initial={{ opacity: 1 }}
-			animate={{ opacity: readyToExit ? 0 : 1 }}
+			animate={{ opacity: 1 }}
 			transition={{ duration: 0.6, ease: "easeInOut" }}
-			onAnimationComplete={() => {
-				if (readyToExit) onDone?.();
-			}}
 			aria-label="Splash screen"
 		>
 			<div className="w-full max-w-4xl px-6">
@@ -114,21 +103,29 @@ export default function SplashScreen({ onDone, totalDurationMs = 4600 }: SplashS
 							<span className="text-white mr-2">$</span>
 						</div>
 						
-						{/* Typed commands */}
-						{typedText.map((line, idx) => (
+						{/* Completed lines */}
+						{typedLines.map((line, idx) => (
 							<div key={idx} className="flex mb-2">
 								<span className="text-green-400 mr-2">user@portfolio</span>
 								<span className="text-blue-400 mr-2">~</span>
 								<span className="text-white mr-2">$</span>
 								<span className="text-white">{line}</span>
-								{idx === typedText.length - 1 && (
-									<span className="cursor-block ml-1 text-white">█</span>
-								)}
 							</div>
 						))}
 						
+						{/* Current typing line */}
+						{isTyping && (
+							<div className="flex mb-2">
+								<span className="text-green-400 mr-2">user@portfolio</span>
+								<span className="text-blue-400 mr-2">~</span>
+								<span className="text-white mr-2">$</span>
+								<span className="text-white">{currentLine}</span>
+								<span className="cursor-block text-white">█</span>
+							</div>
+						)}
+						
 						{/* Final prompt after typing is complete */}
-						{typedText.every(line => line.length > 0) && (
+						{!isTyping && (
 							<div className="flex">
 								<span className="text-green-400 mr-2">user@portfolio</span>
 								<span className="text-blue-400 mr-2">~</span>
